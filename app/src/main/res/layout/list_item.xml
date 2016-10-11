@@ -32,7 +32,7 @@
 
         </LinearLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -44,7 +44,8 @@
                     android:text="name: "
                     android:id="@+id/textview2"
                     android:textSize="15dp"
-                    android:textIsSelectable="false" />
+                    android:textIsSelectable="false"
+                    android:layout_gravity="left" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -52,15 +53,23 @@
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:id="@+id/textNameItem"
                     android:textSize="15dp"
-                    android:layout_weight="1" />
+                    android:layout_gravity="left"
+
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@+id/textview2"
+                    android:layout_toEndOf="@+id/textview2" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="date:"
+                    android:text="date: "
                     android:id="@+id/textView7"
-                    android:textSize="15dp" />
+                    android:textSize="15dp"
+                    android:layout_gravity="right"
+                    android:layout_alignParentTop="true"
+                    android:layout_toLeftOf="@+id/textDateItem"
+                    android:layout_toStartOf="@+id/textDateItem" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -68,7 +77,10 @@
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:id="@+id/textDateItem"
                     android:textSize="15dp"
-                    android:layout_weight="1" />
-        </LinearLayout>
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                     />
+        </RelativeLayout>
 
 </LinearLayout>

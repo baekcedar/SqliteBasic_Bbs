@@ -19,8 +19,12 @@ class ListAdapter extends BaseAdapter {
     Data data;
     TextView title, name, ndate;
 
+    public void listRefresh(ArrayList<Data> datas){
+        this.datas = datas;
+        notifyDataSetChanged();
+    }
 
-
+    // 생성자
     public ListAdapter(Context context, ArrayList<Data> datas){
         this.context = context;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -53,7 +57,14 @@ class ListAdapter extends BaseAdapter {
         title   = (TextView) convertView.findViewById(R.id.textTitleItem);
         name    = (TextView) convertView.findViewById(R.id.textNameItem);
         ndate   = (TextView) convertView.findViewById(R.id.textDateItem);
-        title.setText(data.title);
+
+         // title 20 자 이상이면 잘라서 출력
+        if(data.title.length() > 20){
+            title.setText(data.title.substring(0,20));
+        }else{
+            title.setText(data.title);
+        }
+
         name.setText(data.name);
         ndate.setText(data.ndate);
 

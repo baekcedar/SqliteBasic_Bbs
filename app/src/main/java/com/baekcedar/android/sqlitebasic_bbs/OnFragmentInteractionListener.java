@@ -4,13 +4,17 @@ import java.util.ArrayList;
 
 
 public interface OnFragmentInteractionListener {
-    void onFragmentInteraction(int pageFlag);
+    void onFragmentInteraction(int actionFlag);
     ArrayList<Data> getDatas();
     Data getData(int position);
-    void setUpdate(Data data);
+
     void setInsert(Data data);
-    void setPosition(int position);
+    void setUpdate(Data data);
+    void setDelete(int position);
+
     void setBox(int position);
+
+    void listRefresh();
 
     int getUpdateFlag();
 

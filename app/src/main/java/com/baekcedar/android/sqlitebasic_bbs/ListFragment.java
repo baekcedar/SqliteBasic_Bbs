@@ -20,7 +20,7 @@ public class ListFragment extends Fragment {
     private static final int EDIT_PAGE = 2;
     ListView listView;
     Button writeBtn;
-
+    ListAdapter adapter;
 
     private String mParam1;
     private String mParam2;
@@ -62,10 +62,12 @@ public class ListFragment extends Fragment {
 
         final View view =  inflater.inflate(R.layout.fragment_list, container, false);
         listView = (ListView) view.findViewById(R.id.listView);
-
-        ListAdapter adapter = new ListAdapter(getActivity(),mListener.getDatas());
-        listView.setAdapter(adapter);
         writeBtn = (Button) view.findViewById(R.id.writeBtn);
+        adapter = new ListAdapter(getActivity(),mListener.getDatas());
+        listView.setAdapter(adapter);
+
+
+       // write 버튼
         writeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -74,6 +76,7 @@ public class ListFragment extends Fragment {
 
             }
         });
+        // List Item Click
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -84,16 +87,26 @@ public class ListFragment extends Fragment {
                // 클릭시 페이지 이동
             }
         });
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+
+                mListener.setDelete(position);
+                mListener.listRefresh();
+                mListener.onFragmentInteraction(MainActivity.LIST_PAGE);
+
+                return true; //true면 Click 무시
+            }
+        });
 
         return view;
     }
 
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Fragment fragment) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(0);
-        }
+    public void setList(){
+
+        Dbconnect.listPrint(getActivity().getApplicationContext());
     }
 
     @Override
@@ -106,6 +119,7 @@ public class ListFragment extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+        setList();
     }
 
     @Override

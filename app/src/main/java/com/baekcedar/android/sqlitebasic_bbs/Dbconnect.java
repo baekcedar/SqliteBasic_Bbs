@@ -3,8 +3,10 @@ package com.baekcedar.android.sqlitebasic_bbs;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -12,54 +14,47 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-/**
- * Created by HM on 2016-10-10.
- */
+import java.util.ArrayList;
+
+
 public class Dbconnect {
-    SQLiteDatabase db;
-    String fileName;
-    String targetFile;
-    Context context;
-    Dbconnect(Context context, String fileName){
-        this.context = context;
-        this.fileName = fileName;
-    }
-    public void init(){
-        Log.i("TEST init",getFullpath(fileName) );
-        File file = new File(getFullpath(fileName));
+
+
+    public static final String DB_NAME = "bbs.sqlite";
+
+    public static  void init(Context context){
+
+
+        File file = new File(getFullpath(context));
         if(!file.exists()){
-            assetToDisk(fileName);
-            Log.i("TEST init","assetToDisk ");
+            assetToDisk(context);
         }
 
 
     }
-    public SQLiteDatabase openDb(){
-        return  SQLiteDatabase.openDatabase(getFullpath(fileName),null,0);
+    public static SQLiteDatabase openDb(Context context){
+        return  SQLiteDatabase.openDatabase(getFullpath(context),null,0);
     }
-    public String getFullpath(String filename){
-        return context.getFilesDir().getAbsolutePath() + File.separator + filename;
+    public static String getFullpath(Context context){
+        return context.getFilesDir().getAbsolutePath() + File.separator + DB_NAME;
     }
-    public void assetToDisk(String filename){
+    public static void assetToDisk(Context context){
         // 외부에서 작성된 sqlite db 파일 사용하기
         // 1. assets 에 담아둔 파일을 internal 혹은 external 공간으로 복사한다.
-
+        SQLiteDatabase db = null;
         InputStream is = null;
         FileOutputStream fos = null;
         BufferedOutputStream bos = null;
         BufferedInputStream bis = null;
         try {
-            targetFile = getFullpath(fileName);
-            db = openDb();
+            String targetFile = getFullpath(context);
+            db  = openDb(context);
             AssetManager manager = context.getAssets();
-            is = manager.open(filename);
+            is = manager.open(DB_NAME);
             bis = new BufferedInputStream(is);
 
             // 2. 저장할 위치에 파일이 없으면 생성해둔다.
-
-
             File file = new File(targetFile);
-
             if(!file.exists()){
                 file.createNewFile();
             }
@@ -92,11 +87,11 @@ public class Dbconnect {
     }
 
     //수정
-    public void dbUpdate(Data data){
+    public static void dbUpdate(Context context, Data data){
 
         SQLiteDatabase db = null;
         try {
-            db = openDb();
+            db = openDb(context);
             if (db != null) {
                 db.execSQL("update bbs " +
                         "set name='"+data.name+"' " +
@@ -104,6 +99,7 @@ public class Dbconnect {
                         ",contents='"+data.contents+"' " +
                         " where no="+data.no);
             }
+            Toast.makeText(context,"Update Successful",Toast.LENGTH_SHORT).show();
         }catch (Exception e){
             e.printStackTrace();
         }finally {
@@ -116,13 +112,37 @@ public class Dbconnect {
     }
 
     // 입력
-    public void dbInsert(Data data) {
+    public static void dbInsert(Context context, Data data) {
         SQLiteDatabase db = null;
         try {
-            db = openDb();
+            db = openDb(context);
             if (db != null) {
                 // 쿼리를 실행해준다. select 문을 제외한 모든 쿼리에 사용
-                db.execSQL("insert into bbs(name,title,contents) values('"+data.name+"','"+data.title+"','"+data.contents+"')");
+                db.execSQL("insert into bbs(name,title,contents) values('" +
+                        data.name +
+                        "','" + data.title +
+                        "','" + data.contents + "')");
+                Toast.makeText(context,"Insert Successful",Toast.LENGTH_SHORT).show();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            try {
+                if (db != null) db.close();
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+    public static void dbDelete(Context context, int no){
+        SQLiteDatabase db = null;
+        try {
+            db = openDb(context);
+            if (db != null) {
+                // 쿼리를 실행해준다. select 문을 제외한 모든 쿼리에 사용
+                db.execSQL("delete from bbs where no ='"+no+"'");
+
+                Toast.makeText(context,"Delete Successful",Toast.LENGTH_SHORT).show();
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -135,4 +155,80 @@ public class Dbconnect {
         }
     }
 
+    public static ArrayList<Data> listPrint(Context context) {
+        ArrayList<Data> datas = new ArrayList<>();
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+
+        try {
+            db = openDb(context);
+            if (db != null) {
+                // 기본쿼리
+                String query = "select no,title,name,ndate from bbs order by ndate desc ";
+                cursor = db.rawQuery(query, null);
+                while (cursor.moveToNext()) {
+                    Data data = new Data();
+                    int idx = cursor.getColumnIndex("no");
+                    data.no = cursor.getInt(idx);
+                    idx = cursor.getColumnIndex("name");
+                    data.name = cursor.getString(idx);
+                    idx = cursor.getColumnIndex("title");
+                    data.title = cursor.getString(idx);
+                    idx = cursor.getColumnIndex("ndate");
+                    data.ndate = cursor.getString(idx);
+                    datas.add(data);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            try {
+                if (cursor != null) cursor.close();
+                if (db != null) db.close();
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+        return datas;
+    }
+    // data.no 값을 받아 해당 레코드 select
+    public static Data detailSelect(Context context, int no) {
+        // 받은 no 값으로 해당 레코드만 select 가져오기
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+        Data data = new Data();
+        try {
+            db = openDb(context);
+            if (db != null) {
+                // 기본쿼리
+                Log.i("TEST", no+"");
+                String query = "select * from bbs where no="+no;
+
+                cursor = db.rawQuery(query, null);
+
+                if (cursor.moveToNext()) {
+                    int idx = cursor.getColumnIndex("no");
+                    data.no = cursor.getInt(idx);
+                    idx = cursor.getColumnIndex("name");
+                    data.name = cursor.getString(idx);
+                    idx = cursor.getColumnIndex("title");
+                    data.title = cursor.getString(idx);
+                    idx = cursor.getColumnIndex("contents");
+                    data.contents = cursor.getString(idx);
+                    idx = cursor.getColumnIndex("ndate");
+                    data.ndate = cursor.getString(idx);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            try {
+                if (cursor != null) cursor.close();
+                if (db != null) db.close();
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+        return data;
+    }
 }

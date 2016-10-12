@@ -1,6 +1,7 @@
 package com.baekcedar.android.sqlitebasic_bbs;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,13 +18,19 @@ class ListAdapter extends BaseAdapter {
     Context context;
     LayoutInflater inflater;
     Data data;
-    TextView title, name, ndate;
+    TextView no, title, name, ndate;
 
     public void listRefresh(ArrayList<Data> datas){
         this.datas = datas;
         notifyDataSetChanged();
+        Log.i("TEST adapterlistRefresh", "notifyDataSetChanged");
     }
-
+    public void listAdd(ArrayList<Data> addData){
+        for(int i =0 ;i <  addData.size(); i ++){
+            datas.add(addData.get(i));
+        }
+        notifyDataSetChanged();
+    }
     // 생성자
     public ListAdapter(Context context, ArrayList<Data> datas){
         this.context = context;
@@ -39,7 +46,6 @@ class ListAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-
         return datas.get(position);
     }
 
@@ -53,10 +59,10 @@ class ListAdapter extends BaseAdapter {
         data = datas.get(position);
         if(convertView == null)
             convertView = inflater.inflate(R.layout.list_item, null);
-
-        title   = (TextView) convertView.findViewById(R.id.textTitleItem);
-        name    = (TextView) convertView.findViewById(R.id.textNameItem);
-        ndate   = (TextView) convertView.findViewById(R.id.textDateItem);
+            no      = (TextView) convertView.findViewById(R.id.textNoItem);
+            title   = (TextView) convertView.findViewById(R.id.textTitleItem);
+            name    = (TextView) convertView.findViewById(R.id.textNameItem);
+            ndate   = (TextView) convertView.findViewById(R.id.textDateItem);
 
          // title 20 자 이상이면 잘라서 출력
         if(data.title.length() > 20){
@@ -65,6 +71,7 @@ class ListAdapter extends BaseAdapter {
             title.setText(data.title);
         }
 
+        no.setText(Integer.toString(data.no));
         name.setText(data.name);
         ndate.setText(data.ndate);
 

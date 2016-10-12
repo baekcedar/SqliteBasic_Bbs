@@ -3,7 +3,6 @@ package com.baekcedar.android.sqlitebasic_bbs;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,7 +58,7 @@ public class EditFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_edit, container, false);
-        Log.i("TEST","onCreateView");
+
         textNo          = (TextView) view.findViewById(R.id.textNo);
         name            = (EditText) view.findViewById(R.id.textName);
         editTextTitle   = (EditText) view.findViewById(R.id.editTextTitle);
@@ -73,7 +72,7 @@ public class EditFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 keyBoardOff();
-                mListener.listRefresh();
+                mListener.listRefresh(10);
                 mListener.onFragmentInteraction(MainActivity.LIST_PAGE);
 
             }
@@ -105,7 +104,7 @@ public class EditFragment extends Fragment {
                         mListener.setInsert(data);
                     }
                     keyBoardOff();
-                    mListener.listRefresh();
+                    mListener.listRefresh(10);
                     mListener.onFragmentInteraction(MainActivity.LIST_PAGE);
                 }
 

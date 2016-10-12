@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
 
         Dbconnect.init(this);
         db = Dbconnect.openDb(this);
-        datas = Dbconnect.listPrint(this);
+        datas = Dbconnect.listPrint(this, 0);
 
         if (db == null) {
             Log.i("TEST", "DB NULL");
@@ -75,15 +75,24 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
     }
 
     @Override  // 리스트 갱신
-    public void listRefresh() {
+    public void listRefresh(int listCount) {
+
         datas = null;
         editf.setWirteMode();
-        datas = Dbconnect.listPrint(this);
-        listf.adapter.listRefresh(getDatas());
+        datas = Dbconnect.listPrint(this ,listCount);
+        listf.adapter.listRefresh(getDatas(listCount));
 
 
     }
-
+    @Override
+    public void setDatas(ArrayList<Data> datas){
+        this.datas = datas;
+    }
+    @Override  //getDatas
+    public ArrayList<Data> getDatas(int listCount) {
+        datas = Dbconnect.listPrint(this, listCount);
+        return datas;
+    }
     @Override
     public int getUpdateFlag() {
         return updateFlag;
@@ -100,11 +109,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
     public void setDelete(int position) {
         Dbconnect.dbDelete(this, datas.get(position).no);
     }
-    @Override
-    public ArrayList<Data> getDatas() {
-        datas = Dbconnect.listPrint(this);
-        return datas;
-    }
+
     @Override
     public Data getData(int position){
         return datas.get(position);

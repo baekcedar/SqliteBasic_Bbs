@@ -135,7 +135,7 @@ public class Dbconnect {
         try {
             db = openDb(context);
             if (db != null) {
-                // 쿼리를 실행해준다. select 문을 제외한 모든 쿼리에 사용
+
                 db.execSQL("delete from bbs3 where no ='"+no+"'");
 
                 Toast.makeText(context,"Delete Successful",Toast.LENGTH_SHORT).show();
